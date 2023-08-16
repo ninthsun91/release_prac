@@ -1,0 +1,21 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+name: Publish to npm
+
+jobs:
+  build:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Build
+        run: echo "Hello World"
