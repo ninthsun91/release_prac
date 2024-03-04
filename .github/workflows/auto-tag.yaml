@@ -24,20 +24,10 @@ jobs:
         id: package_version
         with:
           project: './package.json'
-      
-      - name: Check if tag exists
-        run: |
-          git fetch --tags
-          if git rev-parse "v${{ steps.package_version.outputs.version }}" >/dev/null 2>&1; then
-            echo "Tag v${{ steps.package_version.outputs.version }} already exists"
-            exit 1
-          fi
 
       - name: Create and push tag
-        run: |
-          git config --global user.email "ninthsun91@gmail.com"
-          git config --global user.name "Ray Kim"
-          git tag -a "v${{ steps.package_version.outputs.version }}" -m "Version v${{ steps.package_version.outputs.version }}"
-          git push origin "v${{ steps.package_version.outputs.version }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: rickstaa/action-create-tag@v1
+        id: create-tag
+        with:
+          tag: "v${{ steps.package_version.outputs.version }}"
+          tag_exists_error: false
