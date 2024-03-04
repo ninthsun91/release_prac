@@ -35,5 +35,7 @@ jobs:
 
       - name: Create and push tag
         run: |
+          git config --global user.email "dev@meshed3d.com"
+          git config --global user.name "Landing Dev"
           git tag -a "v${{ steps.package_version.outputs.version }}" -m "Version v${{ steps.package_version.outputs.version }}"
           git push origin "v${{ steps.package_version.outputs.version }}"
