@@ -17,17 +17,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Specify the Node.js version you are using
+          node-version: '20'
 
       - name: Get version from package.json
         uses: bbonkr/get-version-action@v1
         id: package_version
         with:
           project: './package.json'
+      
+      - name: Check if tag exists
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ steps.package_version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag v${{ steps.package_version.outputs.version }} already exists"
+            exit 1
+          fi
 
       - name: Create and push tag
         run: |
-          echo "v${{ steps.package_version.outputs.version }}"  
-        # run: |
-        #   git tag -a "v${{ steps.package_version.outputs.version }}" -m "Version v${{ steps.package_version.outputs.version }}"
-        #   git push origin "v${{ steps.package_version.outputs.version }}"
+          git tag -a "v${{ steps.package_version.outputs.version }}" -m "Version v${{ steps.package_version.outputs.version }}"
+          git push origin "v${{ steps.package_version.outputs.version }}"
