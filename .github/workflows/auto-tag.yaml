@@ -10,6 +10,8 @@ on:
 jobs:
   tag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -19,10 +21,25 @@ jobs:
         with:
           node-version: '20'
 
-      - run: echo "previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> $GITHUB_ENV
-      - name: Create Tag
-        id: create_tag
-        uses: jaywcjlove/create-tag-action@main
-        if: env.previous_tag
+      - name: Get version from package.json
+        uses: bbonkr/get-version-action@v1
+        id: package_version
         with:
-          package-path: ./package.json
+          project: './package.json'
+
+      - name: Check tag duplication
+        uses: bbonkr/git-tag-check-action@v1
+        id: tag_check
+        with:
+          tag: "v${{ steps.package_version.outputs.version }}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Push tag if not found
+        if: steps.tag_check.outputs.tag == ''
+        run: |
+          git config --global user.name 'Ray Kim'
+          git config --global user.email 'ninthsun91@gmail.com'
+          git tag -a "v${{ steps.package_version.outputs.version }}" -m "Release v${{ steps.package_version.outputs.version }}"
+          git push origin "v${{ steps.package_version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
