@@ -32,6 +32,7 @@ jobs:
           tag: "v${{ steps.package_version.outputs.version }}"
           github_token: ${{ secrets.GITHUB_TOKEN }}
         
-      - name: Print result
+      - name: Print tag if not found
+        if: steps.tag_check.outputs.tag == ''
         run: |
-          echo "Tag check result: ${{ steps.tag_check.outputs.tag }}"
+          echo "Tag: v${{ steps.package_version.outputs.version }}"
