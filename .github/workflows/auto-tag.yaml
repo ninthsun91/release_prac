@@ -19,20 +19,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Get version from package.json
-        uses: bbonkr/get-version-action@v1
-        id: package_version
+      - run: echo "previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> $GITHUB_ENV
+      - name: Create Tag
+        id: create_tag
+        uses: jaywcjlove/create-tag-action@main
+        if: env.previous_tag
         with:
-          project: './package.json'
-
-      - name: Check tag duplication
-        uses: bbonkr/git-tag-check-action@v1
-        id: tag_check
-        with:
-          tag: "v${{ steps.package_version.outputs.version }}"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-        
-      - name: Print tag if not found
-        if: steps.tag_check.outputs.tag == ''
-        run: |
-          echo "Tag: v${{ steps.package_version.outputs.version }}"
+          package-path: ./package.json
