@@ -25,9 +25,13 @@ jobs:
         with:
           project: './package.json'
 
-      - name: Create and push tag
-        uses: rickstaa/action-create-tag@v1
-        id: create-tag
+      - name: Check tag duplication
+        uses: bbonkr/git-tag-check-action@v1
+        id: tag_check
         with:
-          tag: "v${{ steps.package_version.outputs.version }}"
-          tag_exists_error: false
+          tag: ${{ steps.package_version.outputs.version }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Print result
+        run: |
+          echo "Tag check result: ${{ steps.tag_check.outputs.tag }}"
